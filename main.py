@@ -13,7 +13,7 @@ BLOG_CATEGORY_MAP = {
 
 
 def main():
-    blog_name = "" # 조양마트, 삐에로마켓
+    blog_name = "조양마트" # 조양마트, 삐에로마켓
 
     blog_id = BLOG_CATEGORY_MAP[blog_name]["blog_id"]
     category_name = BLOG_CATEGORY_MAP[blog_name]["category"]
@@ -44,6 +44,8 @@ def main():
                 image = image + "?type=w966"
             posted_images.append(image)
     
+    print("Title:", result["title"])
+    print("Date:", result["date"])
     print("Content:", result["content"])
     print("Images:", posted_images)
 

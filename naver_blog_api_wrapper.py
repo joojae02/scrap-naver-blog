@@ -78,33 +78,50 @@ class NaverBlogAPIWrapper:
             print(f"Get post ids: {len(post_ids)} posts found.")
         return sorted(list(post_ids))
 
-    def get_contents(self, post_id: str) -> Dict[str, List[str]]:
+    def get_contents(self, post_id: str) -> Dict[str, str]:
         """
         Get contents of a post
 
         :param post_id: Post id to get contents
-        :return: A dictionary of contents, images
+        :return: A dictionary of title, date, content, images
         """
         url = f"http://blog.naver.com/PostView.nhn"
-        params = {"blogId": self.naver_blog_id}
-
-        params["logNo"] = post_id
+        params = {
+            "blogId": self.naver_blog_id,
+            "logNo": post_id,
+        }
 
         response = requests.get(url, params=params)
 
         soup = BeautifulSoup(response.text, "html.parser")
-        text = soup.select_one(f"#post-view{post_id} > div > div.se-main-container")
+        
+        # Get title and date from first div (document title)
+        title_div = soup.select_one(f"#post-view{post_id} > div > div.se-documentTitle")
+        title = ""
+        date = ""
+        if title_div:
+            # Get title from se-module-text
+            title_elem = title_div.select_one(".se-title-text")
+            if title_elem:
+                title = title_elem.get_text().strip()
+            
+            # Get date from se_publishDate
+            date_elem = title_div.select_one(".se_publishDate")
+            if date_elem:
+                date = date_elem.get_text().strip()
+        
+        # Get content from second div (main container)
+        content_div = soup.select_one(f"#post-view{post_id} > div > div.se-main-container")
 
-        if not text:
+        if not content_div:
             print(f"[Error] cannot select content in {post_id}.")
             return {}
         
-        content = ""
-        content = text.get_text("\n").replace("\xa0", " ")  # Space unicode replace
+        content = content_div.get_text("\n").replace("\xa0", " ")  # Space unicode replace
         content = re.sub(r"\s+", " ", content).strip()
 
         images = []
-        img_tags = text.find_all('img')
+        img_tags = content_div.find_all('img')
 
         for img_tag in img_tags:
             img_src = img_tag.get('src')
@@ -117,6 +134,8 @@ class NaverBlogAPIWrapper:
             images.append(image_url)
 
         return {
+            "title": title,
+            "date": date,
             "content": content,
             "images": images
         }
