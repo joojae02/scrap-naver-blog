@@ -1,6 +1,6 @@
 import json
 import re
-from typing import List
+from typing import Dict, List
 import requests
 from bs4 import BeautifulSoup
 
@@ -78,7 +78,7 @@ class NaverBlogAPIWrapper:
             print(f"Get post ids: {len(post_ids)} posts found.")
         return sorted(list(post_ids))
 
-    def get_contents(self, post_id: str) -> dict:
+    def get_contents(self, post_id: str) -> Dict[str, List[str]]:
         """
         Get contents of a post
 
