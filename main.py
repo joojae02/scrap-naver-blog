@@ -35,7 +35,7 @@ def main():
     result = naver_blog.get_contents(new_post_id)
 
     posted_images = []
-    for image in result["images"]:
+    for image in result.images:
         if image.startswith("https://postfiles.pstatic.net"): # 실제 유저가 등록한 이미지
             # Replace any type parameter with w966 image size
             if "?type=" in image:
@@ -44,9 +44,9 @@ def main():
                 image = image + "?type=w966"
             posted_images.append(image)
     
-    print("Title:", result["title"])
-    print("Date:", result["date"])
-    print("Content:", result["content"])
+    print("Title:", result.title)
+    print("Date:", result.date)
+    print("Content:", result.content)
     print("Images:", posted_images)
 
 

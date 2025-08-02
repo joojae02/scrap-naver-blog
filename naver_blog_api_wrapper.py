@@ -3,7 +3,7 @@ import re
 from typing import Dict, List
 import requests
 from bs4 import BeautifulSoup
-
+from models import NaverBlogPost
 
 class NaverBlogAPIWrapper:
     """
@@ -78,12 +78,12 @@ class NaverBlogAPIWrapper:
             print(f"Get post ids: {len(post_ids)} posts found.")
         return sorted(list(post_ids))
 
-    def get_contents(self, post_id: str) -> Dict[str, str]:
+    def get_contents(self, post_id: str) -> NaverBlogPost:
         """
         Get contents of a post
 
         :param post_id: Post id to get contents
-        :return: A dictionary of title, date, content, images
+        :return: NaverBlogPost object
         """
         url = f"http://blog.naver.com/PostView.nhn"
         params = {
@@ -115,7 +115,7 @@ class NaverBlogAPIWrapper:
 
         if not content_div:
             print(f"[Error] cannot select content in {post_id}.")
-            return {}
+            return None
         
         content = content_div.get_text("\n").replace("\xa0", " ")  # Space unicode replace
         content = re.sub(r"\s+", " ", content).strip()
@@ -133,9 +133,4 @@ class NaverBlogAPIWrapper:
                 image_url = img_src.split("?")[0] + "?type=w966"
             images.append(image_url)
 
-        return {
-            "title": title,
-            "date": date,
-            "content": content,
-            "images": images
-        }
+        return NaverBlogPost(title=title, date=date, content=content, images=images)
